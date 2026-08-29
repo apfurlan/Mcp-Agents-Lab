@@ -1,4 +1,4 @@
-# MCP Agents Laboratory
+# **MCP Agents Laboratory**
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![uv](https://img.shields.io/badge/uv-0.12-DE5FE9?logo=uv&logoColor=white)
