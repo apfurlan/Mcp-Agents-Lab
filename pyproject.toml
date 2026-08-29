@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mcp-agents-lab = "mcp_agents_lab:main"
+agente = "mcp_agents_lab.agente:main"
 
 [build-system]
 requires = ["uv_build>=0.12.7,<0.13.0"]
