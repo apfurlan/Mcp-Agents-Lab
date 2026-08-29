@@ -6,6 +6,7 @@ from pathlib import Path
 
 
 MODELO = "qwen3:4b"
+MAX_ITERACOES = 5
 
 
 def listar_arquivos(pasta: str ) -> str:
@@ -67,33 +68,35 @@ def main() -> None:
         },
     ]
 
-    response = ollama.chat(
-        model=MODELO,
-        messages=messages,
-        tools=TOOLS_SCHEMA,
-    )
+    for _ in range(MAX_ITERACOES):
+        response = ollama.chat(
+            model=MODELO,
+            messages=messages,
+            tools=TOOLS_SCHEMA,
+        )
+        messages.append(response.message)
 
-    if response.message.thinking:
-        print("=== THINKING ===")
-        print(response.message.thinking)
+        if not response.message.tool_calls:
+            print(response.message.content)
+            break
 
-    print(response.message.tool_calls)
-    tc = response.message.tool_calls[0]
+        for tc in response.message.tool_calls:
+            funcao = FERRAMENTAS.get(tc.function.name)
+            if funcao is None:
+                resultado = f"ferramenta desconhecida: {tc.function.name}"
+            else:
+                try:
+                    resultado = funcao(**tc.function.arguments)
+                except Exception as erro:
+                    resultado = f"erro em {tc.function.name}: {erro}"
 
-    resultado = FERRAMENTAS[tc.function.name](**tc.function.arguments)
-
-    messages.append(response.message)
-
-    messages.append({"role": "tool", "tool_name": tc.function.name, "content": resultado})
-
-    resposta_final = ollama.chat(
-        model=MODELO,
-        messages=messages,
-        tools=TOOLS_SCHEMA,
-    )
-
-    print("\n=== CONTENT ===")
-    print(resposta_final.message.content)
+            messages.append({
+                "role": "tool",
+                "tool_name": tc.function.name,
+                "content": str(resultado),
+            })
+    else:
+        print("limite de iterações atingido")
 
 
 if __name__ == "__main__":
