@@ -46,7 +46,7 @@ TOOLS_SCHEMA = [
 ]
 
 
-FERRAMENTAS = {
+FERRAMENTAS ={
     "listar_arquivos": listar_arquivos,
 }
 
